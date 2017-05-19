@@ -12,4 +12,8 @@ public class SpringBeanTest {
     public SpringBeanTest(){
         System.err.println("create springBeanTest");
     }
+
+    public void print(){
+        System.out.print(" spring bean test");
+    }
 }
