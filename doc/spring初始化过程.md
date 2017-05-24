@@ -861,6 +861,12 @@ public Object doResolveDependency(DependencyDescriptor descriptor, String beanNa
 		}
 	}
 ```
+# 总结
+总结一下，没有总结归纳，就没有结果，也就没有再进一步的基础。
+
+主要就是两方面的一个宏观认识
+1. bean的创建
+IOC就是一个bean的集合，bean的创建也由他负责
 
 
 
