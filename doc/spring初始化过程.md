@@ -866,7 +866,21 @@ public Object doResolveDependency(DependencyDescriptor descriptor, String beanNa
 
 主要就是两方面的一个宏观认识
 1. bean的创建
-IOC就是一个bean的集合，bean的创建也由他负责
+IOC就是一个bean的集合，bean的创建也由他负责,那么什么时候创建，怎么创建bean？
+
+需要考虑bean的scope，一种singleton,一种prototype;还有是延迟加载属性
+
+singleton就是只创建一次，会放到一个map中，以便下次使用；prototype就是每次都创建一个新的实例
+
+2. bean的属性注入
+也一样，什么时候注入，怎么注入
+
+在创建bean之后，先找到需要注入的属性，也就是@Autowired注解的方法，或者属性
+
+方法就需要调用，属性就需要修改值
+
+
+整体的思路很简单，只是为了满足丰富的功能，以及符合设计原则，代码复杂得多。还需要抽丝剥茧，一层一层深入
 
 
 
