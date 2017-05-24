@@ -13,12 +13,12 @@ public class MessagePrinter {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MessagePrinter.class);
 
-//    private MessageService service;
-//
-//    @Autowired
-//    public void setService(MessageService service) {
-//        this.service = service;
-//    }
+    private MessageService service;
+
+    @Autowired
+    public void setService(MessageService service) {
+        this.service = service;
+    }
 
     public MessagePrinter(){
         System.err.print("------------");

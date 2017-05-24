@@ -81,6 +81,7 @@ public class InjectionMetadata {
 				(this.checkedElements != null ? this.checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
 			boolean debug = logger.isDebugEnabled();
+			//循环每个@Autowired的元素
 			for (InjectedElement element : elementsToIterate) {
 				if (debug) {
 					logger.debug("Processing injected element of bean '" + beanName + "': " + element);

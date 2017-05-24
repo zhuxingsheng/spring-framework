@@ -18,9 +18,11 @@ public class Application {
                 new AnnotationConfigApplicationContext(Application.class);
         MessagePrinter printer = context.getBean(MessagePrinter.class);
         printer.printMessage();
+//        MessagePrinter printer1 = context.getBean(MessagePrinter.class);
+//        printer1.printMessage();
 
-        SpringBeanTest springBeanTest = context.getBean(SpringBeanTest.class);
-        springBeanTest.print();
+//        SpringBeanTest springBeanTest = context.getBean(SpringBeanTest.class);
+//        springBeanTest.print();
 
     }
 }
