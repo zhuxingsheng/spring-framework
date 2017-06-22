@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+        <!-- 定义被代理者 -->
+        <bean id="horse" class="com.jack.aop.BlackHorse"></bean>
+
+        <!-- 定义通知内容，也就是切入点执行前后需要做的事情 -->
+        <bean id="loggerAdvice" class="com.jack.aop.AopLogger"></bean>
+
+        <!-- 定义切入点位置 -->
+        <bean id="sleepPointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+            <property name="pattern" value=".*eat"></property>
+        </bean>
+
+        <!-- 使切入点与通知相关联，完成切面配置 -->
+        <bean id="sleepHelperAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+            <property name="advice" ref="loggerAdvice"></property>
+            <property name="pointcut" ref="sleepPointcut"></property>
+        </bean>
+
+        <!-- 设置代理 -->
+        <bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+            <!-- 代理的对象 -->
+            <property name="target" ref="horse"></property>
+            <!-- 使用切面 -->
+            <property name="interceptorNames" value="sleepHelperAdvisor"></property>
+            <!-- 代理接口，睡觉接口 -->
+            <property name="proxyInterfaces" value="com.jack.aop.Horse"></property>
+        </bean>
+
+</beans>
