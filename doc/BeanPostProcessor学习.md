@@ -253,3 +253,10 @@ protected Object initializeBean(final String beanName, final Object bean, RootBe
 		}
 	}
 ```
+通过代码，可以看出bean的顺序
+
+**bean实例化 --> bean属性注入 --> aware接口 --> postProcessBeforeInitialization方法 --> init-method --> postProcessAfterInitialization**
+
+# AOP
+
+
