@@ -4,6 +4,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,6 +13,11 @@ import org.springframework.stereotype.Service;
  */
 
 public class SpringInitTest{
+    static ApplicationContext context;
+    public static void main(String[] args) {
+
+        context = new ClassPathXmlApplicationContext("application-init.xml");
+    }
 
 
 }
