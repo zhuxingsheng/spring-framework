@@ -180,6 +180,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean enforceDestroyMethod = true;
 
+	/**
+	 * synthetic总的来说，是由编译器引入的字段、方法、类或其他结构，主要用于JVM内部使用，
+	 * 为了遵循某些规范而作的一些小技巧从而绕过这些规范，有点作弊的感觉，只不过是由编译器光明正大的，
+	 * 人为是没有权限的（但事实上有时候还是能被利用到的）。
+	 */
 	private boolean synthetic = false;
 
 	private int role = BeanDefinition.ROLE_APPLICATION;

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +18,10 @@ public class SpringInitTest{
     public static void main(String[] args) {
 
         context = new ClassPathXmlApplicationContext("application-init.xml");
+
+        context.getBean(BeanTest.class);
+
+        ((ClassPathXmlApplicationContext)context).close();
     }
 
 

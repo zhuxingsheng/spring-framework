@@ -258,5 +258,154 @@ protected Object initializeBean(final String beanName, final Object bean, RootBe
 **bean实例化 --> bean属性注入 --> aware接口 --> postProcessBeforeInitialization方法 --> init-method --> postProcessAfterInitialization**
 
 # AOP
+如果要实现代理类有对应的接口，Spring AOP 默认使用 JDK 自带的 InvocationHandler 来实现代理类。
 
+如果没有对应的接口，Spring 使用 CGLib 来实现代理类
 
+那AOP跟这儿的BeanPostProcessor有什么关系呢？ 其实还有一个aspectj
+
+>Spring AOP也是对目标类增强，生成代理类。但是与AspectJ的最大区别在于---Spring AOP的运行时增强，而AspectJ是编译时增强。
+
+>曾经以为AspectJ是Spring AOP一部分，是因为Spring AOP使用了AspectJ的Annotation。使用了Aspect来定义切面,使用Pointcut来定义切入点，使用Advice来定义增强处理。
+虽然使用了Aspect的Annotation，但是并没有使用它的编译器和织入器。其实现原理是JDK 动态代理，在运行时生成代理类。
+
+spring在处理aspectj时，其实使用的是BeanPostProcessor机制
+
+主要处理类是AspectJAwareAdvisorAutoProxyCreator
+![image](http://oirwmbp4e.bkt.clouddn.com/network/aspectjawareadvisorautoproxycreator.jpg)
+
+此类实现了BeanPostProcessor接口，在创建完bean后，postProcessAfterInitialization
+```
+public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		if (bean != null) {
+			Object cacheKey = getCacheKey(bean.getClass(), beanName);
+			if (!this.earlyProxyReferences.contains(cacheKey)) {
+				return wrapIfNecessary(bean, beanName, cacheKey);
+			}
+		}
+		return bean;
+	}
+	
+/**
+	 * Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
+	 * @param bean the raw bean instance
+	 * @param beanName the name of the bean
+	 * @param cacheKey the cache key for metadata access
+	 * @return a proxy wrapping the bean, or the raw bean instance as-is
+	 */
+	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		if (beanName != null && this.targetSourcedBeans.contains(beanName)) {
+			return bean;
+		}
+		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
+			return bean;
+		}
+		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
+			this.advisedBeans.put(cacheKey, Boolean.FALSE);
+			return bean;
+		}
+
+		// Create proxy if we have advice.
+		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+		if (specificInterceptors != DO_NOT_PROXY) {
+			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+			//创建proxy
+			Object proxy = createProxy(
+					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+			this.proxyTypes.put(cacheKey, proxy.getClass());
+			return proxy;
+		}
+
+		this.advisedBeans.put(cacheKey, Boolean.FALSE);
+		return bean;
+	}
+```
+
+```
+protected Object createProxy(
+			Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
+
+		if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
+			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
+		}
+		//通过proxyFactory去创建proxy
+		ProxyFactory proxyFactory = new ProxyFactory();
+		proxyFactory.copyFrom(this);
+
+		if (!proxyFactory.isProxyTargetClass()) {
+			if (shouldProxyTargetClass(beanClass, beanName)) {
+				proxyFactory.setProxyTargetClass(true);
+			}
+			else {
+				evaluateProxyInterfaces(beanClass, proxyFactory);
+			}
+		}
+
+		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+		for (Advisor advisor : advisors) {
+			proxyFactory.addAdvisor(advisor);
+		}
+
+		proxyFactory.setTargetSource(targetSource);
+		customizeProxyFactory(proxyFactory);
+
+		proxyFactory.setFrozen(this.freezeProxy);
+		if (advisorsPreFiltered()) {
+			proxyFactory.setPreFiltered(true);
+		}
+
+		return proxyFactory.getProxy(getProxyClassLoader());
+	}
+```
+
+进入到ProxyFactory里面
+```
+public Object getProxy(ClassLoader classLoader) {
+		return createAopProxy().getProxy(classLoader);
+	}
+	
+protected final synchronized AopProxy createAopProxy() {
+		if (!this.active) {
+			activate();
+		}
+		//这儿又来一个factory
+		return getAopProxyFactory().createAopProxy(this);
+	}
+	
+/**    其实是个默认的实现，没有多态
+	 * Create a new ProxyCreatorSupport instance.
+	 */
+	public ProxyCreatorSupport() {
+		this.aopProxyFactory = new DefaultAopProxyFactory();
+	}
+```
+在这个DefaultAopProxyFactory里面
+```
+@Override
+	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
+			Class<?> targetClass = config.getTargetClass();
+			if (targetClass == null) {
+				throw new AopConfigException("TargetSource cannot determine target class: " +
+						"Either an interface or a target is required for proxy creation.");
+			}
+			//targetClass如果是接口，或者是实现了Proxy接口，就使用JDK动态代理了
+			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
+				return new JdkDynamicAopProxy(config);
+			}
+			//不然使用cglib方式
+			return new ObjenesisCglibAopProxy(config);
+		}
+		else {
+			return new JdkDynamicAopProxy(config);
+		}
+	}
+```
+再深入就是aop自身的知识点了，后面再写文章
+
+# 总结
+通过一系列的实现，其实还是开篇的一句话
+
+BeanPostProcessor是spring的扩展点，遵循“开-闭原则”的一个扩展。
+
+可以进行自定义的实例化、初始化、依赖装配、依赖检查等流程，即可以覆盖默认的实例化，也可以增强初始化、依赖注入、依赖检查等流程
