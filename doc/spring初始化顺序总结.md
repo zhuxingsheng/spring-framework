@@ -83,7 +83,7 @@ destroyMethod
 
 输出结果跟理论是一致的
 
-constractor --> aware --> postProcessBeforeInitialization --> afterPropertiesSet --> initMethod --> postProcessAfterInitialization
+constractor --> 设置属性值 --> aware --> postProcessBeforeInitialization --> afterPropertiesSet --> initMethod --> postProcessAfterInitialization
 
 测试代码：https://github.com/zhuxingsheng/spring-framework/tree/master/spring-test/src/main
 

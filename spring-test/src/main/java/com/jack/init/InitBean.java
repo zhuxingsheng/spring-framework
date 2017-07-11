@@ -15,6 +15,12 @@ public class InitBean implements InitializingBean,BeanNameAware,DisposableBean {
         System.out.println("constractor");
     }
 
+    private InitAwiredBean initAwiredBean;
+
+    public void setInitAwiredBean(InitAwiredBean initAwiredBean){
+        System.out.println("setInitAwiredBean");
+    }
+
     public void initMethod(){
         System.out.println("initMethod");
     }
