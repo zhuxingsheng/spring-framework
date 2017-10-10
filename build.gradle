@@ -991,6 +991,7 @@ project("spring-test") {
 	description = "Spring TestContext Framework"
 
 	dependencies {
+
 		compile(project(":spring-core"))
 		optional(project(":spring-beans"))
 		optional(project(":spring-context"))
@@ -1031,6 +1032,7 @@ project("spring-test") {
 		optional("org.reactivestreams:reactive-streams")
 		optional("io.projectreactor:reactor-core")
 		optional("io.projectreactor.addons:reactor-test")
+		compile("mysql:mysql-connector-java:5.0.6")
 		testCompile(project(":spring-context-support"))
 		testCompile(project(":spring-oxm"))
 		testCompile("javax.mail:javax.mail-api:${javamailVersion}")
@@ -1038,6 +1040,7 @@ project("spring-test") {
 		testCompile("javax.interceptor:javax.interceptor-api:${interceptorApiVersion}")
 		testCompile("org.hibernate:hibernate-core:${hibernate5Version}")
 		testCompile("org.hibernate:hibernate-validator:${hibval5Version}")
+
 		// Enable use of the JUnitPlatform Runner
 		testCompile("org.junit.platform:junit-platform-runner:${junitPlatformVersion}")
 		testCompile("com.thoughtworks.xstream:xstream:${xstreamVersion}")
